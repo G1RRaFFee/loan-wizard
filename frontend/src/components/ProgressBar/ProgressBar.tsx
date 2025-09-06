@@ -1,6 +1,6 @@
 import { JSX, useMemo } from "react";
+
 import { useLocation } from "react-router-dom";
-import { ROUTES } from "@/constants";
 
 export const ProgressBar = (): JSX.Element => {
   const location = useLocation();

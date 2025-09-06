@@ -1,3 +1,5 @@
+import { API_ROUTES } from "@/constants";
+
 export interface CategoryOption {
   value: string;
   label: string;
@@ -23,49 +25,94 @@ interface DummyJsonProduct {
 }
 
 export async function fetchCategories(): Promise<CategoryOption[]> {
-  try {
-    const res = await fetch("https://dummyjson.com/products/categories");
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    const data: unknown = await res.json();
+  const maxRetries = 3;
+  let lastError: Error | null = null;
 
-    if (Array.isArray(data)) {
-      if (data.length === 0 || typeof data[0] === "string") {
-        return (data as string[]).map((s) => ({ value: s, label: s }));
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("VITE_API_URL не настроен");
       }
 
-      if (typeof data[0] === "object" && data[0] !== null) {
-        return (data as DummyJsonCategory[]).map((o) => {
-          const value = o.slug ?? o.name ?? "";
-          const label = o.name ?? o.slug ?? "";
-          return { value, label };
-        });
+      const res = await fetch(API_ROUTES.products.categories, {
+        signal: AbortSignal.timeout(10000), // 10s timeout
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data: unknown = await res.json();
+
+      if (Array.isArray(data)) {
+        if (data.length === 0 || typeof data[0] === "string") {
+          return (data as string[]).map((s) => ({ value: s, label: s }));
+        }
+
+        if (typeof data[0] === "object" && data[0] !== null) {
+          return (data as DummyJsonCategory[]).map((o) => {
+            const value = o.slug ?? o.name ?? "";
+            const label = o.name ?? o.slug ?? "";
+            return { value, label };
+          });
+        }
+      }
+
+      return [];
+    } catch (error) {
+      lastError = error as Error;
+      console.error(`Error fetching categories (attempt ${attempt}):`, error);
+
+      if (attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
       }
     }
-
-    return [];
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    throw new Error("Не удалось загрузить категории");
   }
+
+  throw new Error(
+    `Не удалось загрузить категории после ${maxRetries} попыток: ${lastError?.message}`
+  );
 }
 
 export async function addProduct(title: string): Promise<DummyJsonProduct> {
-  try {
-    const res = await fetch("https://dummyjson.com/products/add", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title }),
-    });
+  const maxRetries = 3;
+  let lastError: Error | null = null;
 
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      if (!apiUrl) {
+        throw new Error("VITE_API_URL не настроен");
+      }
+
+      if (!title || typeof title !== "string" || title.trim().length === 0) {
+        throw new Error("Название продукта обязательно");
+      }
+
+      const res = await fetch(API_ROUTES.products.add, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: title.trim() }),
+        signal: AbortSignal.timeout(15000), // 15s timeout for POST
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      return await res.json();
+    } catch (error) {
+      lastError = error as Error;
+      console.error(`Error adding product (attempt ${attempt}):`, error);
+
+      if (attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      }
     }
-
-    return await res.json();
-  } catch (error) {
-    console.error("Error adding product:", error);
-    throw new Error("Ошибка при отправке заявки");
   }
+
+  throw new Error(
+    `Ошибка при отправке заявки после ${maxRetries} попыток: ${lastError?.message}`
+  );
 }

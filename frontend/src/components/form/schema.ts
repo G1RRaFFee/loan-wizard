@@ -2,7 +2,6 @@
 // - react-hook-form + zod: быстрая и надёжная валидация на каждом шаге с тайпингами.
 // - @tanstack/react-query: кэшируем список категорий (мест работы) и переиспользуем его на нескольких шагах без повторных запросов.
 // - react-input-mask: дешёвая и точная маска телефона без самописной логики парсинга.
-
 import { z } from "zod";
 
 export const GENDERS = [
@@ -56,16 +55,19 @@ export const formSchema = z.object({
 
 export type FormValues = z.infer<typeof formSchema>;
 
-export const step1Fields: Array<keyof FormValues> = [
+export const personalStepFields: Array<keyof FormValues> = [
   "phone",
   "firstName",
   "lastName",
   "gender",
 ];
 
-export const step2Fields: Array<keyof FormValues> = ["workPlace", "address"];
+export const addressStepFields: Array<keyof FormValues> = [
+  "workPlace",
+  "address",
+];
 
-export const step3Fields: Array<keyof FormValues> = ["amount", "termDays"];
+export const loanStepFields: Array<keyof FormValues> = ["amount", "termDays"];
 
 export const defaultValues: FormValues = {
   phone: "",

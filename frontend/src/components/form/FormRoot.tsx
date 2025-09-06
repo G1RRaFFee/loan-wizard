@@ -1,9 +1,16 @@
-import { useEffect, useCallback } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { FormProvider, useForm } from "react-hook-form";
+import { useCallback, useEffect } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { defaultValues, formSchema, step1Fields, step2Fields } from "./schema";
+import { FormProvider, useForm } from "react-hook-form";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+
 import { ProgressBar } from "@/components";
+import {
+  addressStepFields,
+  defaultValues,
+  formSchema,
+  personalStepFields,
+} from "@/components/form";
 import { LS_KEY, ROUTES } from "@/constants";
 
 export function FormRoot() {
@@ -37,13 +44,13 @@ export function FormRoot() {
   useEffect(() => {
     const path = loc.pathname;
     if (path.includes("/address") || path.includes("/loan")) {
-      methods.trigger(step1Fields).then((valid) => {
-        if (!valid) nav(ROUTES.personal, { replace: true });
+      methods.trigger(personalStepFields).then((valid) => {
+        if (!valid) nav(ROUTES.step.personal, { replace: true });
       });
     }
     if (path.includes("/loan")) {
-      methods.trigger(step2Fields).then((valid) => {
-        if (!valid) nav(ROUTES.address, { replace: true });
+      methods.trigger(addressStepFields).then((valid) => {
+        if (!valid) nav(ROUTES.step.address, { replace: true });
       });
     }
   }, [loc.pathname, methods, nav]);

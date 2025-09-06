@@ -1,3 +1,5 @@
+import { type JSX } from "react";
+
 import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 type FieldErrorType = FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
@@ -7,7 +9,10 @@ interface FieldErrorTextProps {
   id?: string;
 }
 
-export default function FieldErrorText({ error, id }: FieldErrorTextProps) {
+export const FieldErrorText = ({
+  error,
+  id,
+}: FieldErrorTextProps): JSX.Element | null => {
   if (!error) return null;
   return (
     <div
@@ -19,4 +24,4 @@ export default function FieldErrorText({ error, id }: FieldErrorTextProps) {
       {typeof error.message === "string" ? error.message : "Ошибка валидации"}
     </div>
   );
-}
+};

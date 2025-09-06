@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { JSX, ReactNode } from "react";
 
 interface StepNavigationProps {
   onPrev?: () => void;
@@ -10,7 +10,7 @@ interface StepNavigationProps {
   children?: ReactNode;
 }
 
-export default function StepNavigation({
+export const StepNavigation = ({
   onPrev,
   onNext,
   nextText = "Далее",
@@ -18,7 +18,7 @@ export default function StepNavigation({
   isLoading = false,
   showPrev = true,
   children,
-}: StepNavigationProps) {
+}: StepNavigationProps): JSX.Element => {
   return (
     <div className="d-flex justify-content-between gap-2 mt-4">
       {showPrev && onPrev ? (
@@ -47,4 +47,4 @@ export default function StepNavigation({
       )}
     </div>
   );
-}
+};

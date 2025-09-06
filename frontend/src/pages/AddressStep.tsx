@@ -1,15 +1,22 @@
+import { type JSX, useCallback } from "react";
+
 import { useQuery } from "@tanstack/react-query";
-import { useFormContext } from "react-hook-form";
+import {
+  FieldError,
+  FieldErrorsImpl,
+  Merge,
+  useFormContext,
+} from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import FieldErrorText from "@/components/FieldError";
-import { step2Fields } from "@/form/schema";
+
 import { fetchCategories } from "@/api/dummyjson";
+import { FieldErrorText } from "@/components";
+import { addressStepFields } from "@/components/form";
 import { ROUTES } from "@/constants";
-import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 type FieldErrorType = FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
 
-export default function Step2() {
+export const AddressStep = (): JSX.Element => {
   const {
     register,
     formState: { errors },
@@ -28,12 +35,12 @@ export default function Step2() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const prev = () => nav(ROUTES.personal);
+  const prev = useCallback(() => nav(ROUTES.step.personal), [nav]);
 
-  const next = async () => {
-    const ok = await trigger(step2Fields);
-    if (ok) nav(ROUTES.loan);
-  };
+  const next = useCallback(async () => {
+    const ok = await trigger(addressStepFields);
+    if (ok) nav(ROUTES.step.loan);
+  }, [trigger, nav]);
 
   return (
     <div className="card p-4">
@@ -41,13 +48,22 @@ export default function Step2() {
         <div className="col-12">
           <label className="form-label">Место работы</label>
           {isLoading ? (
-            <div className="form-text">Загрузка...</div>
+            <div className="form-text">
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Загрузка категорий...
+            </div>
           ) : isError ? (
-            <div className="text-danger">Ошибка загрузки категорий</div>
+            <div className="text-danger">
+              Ошибка загрузки категорий. Попробуйте обновить страницу.
+            </div>
           ) : (
             <select className="form-select" {...register("workPlace")}>
               <option value="">Выберите...</option>
-              {categories!.map((c) => (
+              {categories?.map((c) => (
                 <option key={c.value} value={c.value}>
                   {c.label}
                 </option>
@@ -78,4 +94,4 @@ export default function Step2() {
       </div>
     </div>
   );
-}
+};

@@ -1,22 +1,15 @@
+import type { InputHTMLAttributes, JSX } from "react";
+
 import { Controller, useFormContext } from "react-hook-form";
-import { InputHTMLAttributes } from "react";
 
-function formatPhone(v: string) {
-  const d = v.replace(/\D/g, "").slice(0, 10); // максимум 10 цифр
-  let out = "";
-  for (let i = 0; i < d.length; i++) {
-    out += d[i];
-    if (i === 3 || i === 6) out += " ";
-  }
-  return out;
-}
+import { formatPhone } from "@/utils";
 
-type Props = Omit<
+type PhoneInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "name" | "onChange" | "value"
 >;
 
-export default function PhoneInput(props: Props) {
+export const PhoneInput = (props: PhoneInputProps): JSX.Element => {
   const { control } = useFormContext();
 
   return (
@@ -32,10 +25,9 @@ export default function PhoneInput(props: Props) {
           placeholder="0XXX XXX XXX"
           value={field.value ?? ""}
           onChange={(e) => field.onChange(formatPhone(e.target.value))}
-          aria-describedby={props["aria-describedby"]}
           autoComplete="tel"
         />
       )}
     />
   );
-}
+};

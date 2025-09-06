@@ -1,17 +1,22 @@
-import { useState } from "react";
+import { type JSX, useCallback, useState } from "react";
+
 import { useMutation } from "@tanstack/react-query";
-import { useFormContext } from "react-hook-form";
+import {
+  FieldError,
+  FieldErrorsImpl,
+  Merge,
+  useFormContext,
+} from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import FieldErrorText from "@/components/FieldError";
-import { step3Fields } from "@/form/schema";
-import Modal from "@/components/Modal";
+
 import { addProduct } from "@/api/dummyjson";
+import { FieldErrorText, Modal } from "@/components";
+import { loanStepFields } from "@/components/form";
 import { ROUTES } from "@/constants";
-import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 type FieldErrorType = FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
 
-export default function Step3() {
+export const LoanStep = (): JSX.Element => {
   const {
     register,
     formState: { errors },
@@ -25,16 +30,19 @@ export default function Step3() {
   const mutation = useMutation({
     mutationFn: (title: string) => addProduct(title),
     onSuccess: () => setOpen(true),
+    onError: (error) => {
+      console.error("Ошибка при отправке заявки:", error);
+    },
   });
 
-  const prev = () => nav(ROUTES.address);
+  const prev = useCallback(() => nav(ROUTES.step.address), [nav]);
 
-  const submit = async () => {
-    const ok = await trigger(step3Fields);
+  const submit = useCallback(async () => {
+    const ok = await trigger(loanStepFields);
     if (!ok) return;
     const { firstName, lastName } = getValues();
     mutation.mutate(`${firstName} ${lastName}`);
-  };
+  }, [trigger, getValues, mutation]);
 
   const { firstName, lastName } = getValues();
   const fio = `${lastName} ${firstName}`;
@@ -93,6 +101,11 @@ export default function Step3() {
         >
           {mutation.isPending ? "Отправка..." : "Подать заявку"}
         </button>
+        {mutation.isError && (
+          <div className="alert alert-danger mt-2" role="alert">
+            Ошибка при отправке заявки: {mutation.error?.message}
+          </div>
+        )}
       </div>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Заявка одобрена">
@@ -108,4 +121,4 @@ export default function Step3() {
       </Modal>
     </div>
   );
-}
+};

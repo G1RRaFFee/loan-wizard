@@ -1,13 +1,20 @@
-import { useFormContext } from "react-hook-form";
-import { PhoneInput, FormField, StepNavigation } from "@/components";
-import { GENDERS, step1Fields } from "@/form/schema";
+import { type JSX, useCallback } from "react";
+
+import {
+  FieldError,
+  FieldErrorsImpl,
+  Merge,
+  useFormContext,
+} from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+
+import { FormField, PhoneInput, StepNavigation } from "@/components";
+import { GENDERS, personalStepFields } from "@/components/form";
 import { ROUTES } from "@/constants";
-import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 type FieldErrorType = FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
 
-export default function Step1(): JSX.Element {
+export const PersonalStep = (): JSX.Element => {
   const {
     register,
     formState: { errors },
@@ -15,10 +22,10 @@ export default function Step1(): JSX.Element {
   } = useFormContext();
   const nav = useNavigate();
 
-  const next = async () => {
-    const ok = await trigger(step1Fields);
-    if (ok) nav(ROUTES.address);
-  };
+  const next = useCallback(async () => {
+    const ok = await trigger(personalStepFields);
+    if (ok) nav(ROUTES.step.address);
+  }, [trigger, nav]);
 
   return (
     <section className="card p-4" aria-labelledby="step1-title">
@@ -31,7 +38,6 @@ export default function Step1(): JSX.Element {
             label="Телефон"
             error={errors.phone as FieldErrorType}
             required
-            helpText="Формат: 0XXX XXX XXX"
           >
             <PhoneInput />
           </FormField>
@@ -82,4 +88,4 @@ export default function Step1(): JSX.Element {
       <StepNavigation onNext={next} showPrev={false} />
     </section>
   );
-}
+};

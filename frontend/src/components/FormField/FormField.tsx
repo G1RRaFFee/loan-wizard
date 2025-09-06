@@ -1,6 +1,8 @@
-import { ReactNode, useId } from "react";
+import { type JSX, type ReactNode, useId } from "react";
+
 import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
-import FieldErrorText from "./FieldError";
+
+import { FieldErrorText } from "@/components";
 
 type FieldErrorType = FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
 
@@ -13,14 +15,14 @@ interface FormFieldProps {
   id?: string;
 }
 
-export default function FormField({
+export const FormField = ({
   label,
   children,
   error,
   required = false,
   helpText,
   id: providedId,
-}: FormFieldProps) {
+}: FormFieldProps): JSX.Element => {
   const generatedId = useId();
   const fieldId = providedId || generatedId;
   const helpId = helpText ? `${fieldId}-help` : undefined;
@@ -39,7 +41,7 @@ export default function FormField({
       <div>
         {children}
         {helpText && (
-          <div id={helpId} className="form-text" aria-describedby={helpId}>
+          <div id={helpId} className="form-text">
             {helpText}
           </div>
         )}
@@ -47,4 +49,4 @@ export default function FormField({
       </div>
     </div>
   );
-}
+};
