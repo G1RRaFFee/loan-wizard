@@ -40,7 +40,7 @@ export const StepNavigation = ({
           className="btn btn-primary"
           onClick={onNext}
           disabled={isLoading}
-          type="button"
+          type="submit"
         >
           {isLoading ? "Загрузка..." : nextText}
         </button>

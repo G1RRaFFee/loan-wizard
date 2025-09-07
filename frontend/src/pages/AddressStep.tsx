@@ -46,7 +46,9 @@ export const AddressStep = (): JSX.Element => {
     <div className="card p-4">
       <div className="row g-3">
         <div className="col-12">
-          <label className="form-label">Место работы</label>
+          <label className="form-label" htmlFor="workPlace">
+            Место работы
+          </label>
           {isLoading ? (
             <div className="form-text">
               <span
@@ -61,7 +63,11 @@ export const AddressStep = (): JSX.Element => {
               Ошибка загрузки категорий. Попробуйте обновить страницу.
             </div>
           ) : (
-            <select className="form-select" {...register("workPlace")}>
+            <select
+              id="workPlace"
+              className="form-select"
+              {...register("workPlace")}
+            >
               <option value="">Выберите...</option>
               {categories?.map((c) => (
                 <option key={c.value} value={c.value}>
@@ -74,8 +80,11 @@ export const AddressStep = (): JSX.Element => {
         </div>
 
         <div className="col-12">
-          <label className="form-label">Адрес проживания</label>
+          <label className="form-label" htmlFor="address">
+            Адрес проживания
+          </label>
           <input
+            id="address"
             className="form-control"
             placeholder="Город, улица, дом"
             {...register("address")}

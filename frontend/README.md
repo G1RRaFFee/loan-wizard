@@ -26,8 +26,14 @@
 ## Запуск
 
 ```bash
+Разработка:
 pnpm i
 pnpm dev
+
+Сборка:
+pnpm i
+pnpm build
+pnpm preview
 ```
 
 ```

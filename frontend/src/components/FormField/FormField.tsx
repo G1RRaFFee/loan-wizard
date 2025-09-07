@@ -1,4 +1,10 @@
-import { type JSX, type ReactNode, useId } from "react";
+import {
+  type JSX,
+  type ReactNode,
+  cloneElement,
+  isValidElement,
+  useId,
+} from "react";
 
 import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
@@ -28,18 +34,35 @@ export const FormField = ({
   const helpId = helpText ? `${fieldId}-help` : undefined;
   const errorId = error ? `${fieldId}-error` : undefined;
 
+  const describedBy = [helpId, errorId].filter(Boolean).join(" ") || undefined;
+
+  const child = isValidElement(children)
+    ? cloneElement(children as React.ReactElement, {
+        id: (children as any).props?.id ?? fieldId,
+        "aria-describedby":
+          [(children as any).props?.["aria-describedby"], describedBy]
+            .filter(Boolean)
+            .join(" ") || undefined,
+      })
+    : children;
+
   return (
     <div className="form-group">
       <label htmlFor={fieldId} className="form-label">
         {label}
         {required && (
-          <span className="text-danger ms-1" aria-label="обязательное поле">
+          <span
+            className="text-danger ms-1"
+            title="обязательное поле"
+            aria-hidden="true"
+            role="presentation"
+          >
             *
           </span>
         )}
       </label>
       <div>
-        {children}
+        {child}
         {helpText && (
           <div id={helpId} className="form-text">
             {helpText}

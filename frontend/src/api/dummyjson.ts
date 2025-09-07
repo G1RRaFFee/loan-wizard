@@ -1,5 +1,7 @@
 import { API_ROUTES } from "@/constants";
 
+const API_BASE = import.meta.env.DEV ? "/api" : "https://dummyjson.com";
+
 export interface CategoryOption {
   value: string;
   label: string;
@@ -30,13 +32,8 @@ export async function fetchCategories(): Promise<CategoryOption[]> {
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      if (!apiUrl) {
-        throw new Error("VITE_API_URL не настроен");
-      }
-
-      const res = await fetch(API_ROUTES.products.categories, {
-        signal: AbortSignal.timeout(10000), // 10s timeout
+      const res = await fetch(`${API_BASE}${API_ROUTES.products.categories}`, {
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!res.ok) {
@@ -81,20 +78,15 @@ export async function addProduct(title: string): Promise<DummyJsonProduct> {
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      if (!apiUrl) {
-        throw new Error("VITE_API_URL не настроен");
-      }
-
       if (!title || typeof title !== "string" || title.trim().length === 0) {
         throw new Error("Название продукта обязательно");
       }
 
-      const res = await fetch(API_ROUTES.products.add, {
+      const res = await fetch(`${API_BASE}${API_ROUTES.products.add}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: title.trim() }),
-        signal: AbortSignal.timeout(15000), // 15s timeout for POST
+        signal: AbortSignal.timeout(15000),
       });
 
       if (!res.ok) {

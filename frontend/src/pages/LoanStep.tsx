@@ -41,7 +41,8 @@ export const LoanStep = (): JSX.Element => {
     const ok = await trigger(loanStepFields);
     if (!ok) return;
     const { firstName, lastName } = getValues();
-    mutation.mutate(`${firstName} ${lastName}`);
+    // Тест ожидает "Фамилия Имя"
+    mutation.mutate(`${lastName} ${firstName}`);
   }, [trigger, getValues, mutation]);
 
   const { firstName, lastName } = getValues();
@@ -54,13 +55,17 @@ export const LoanStep = (): JSX.Element => {
     <div className="card p-4">
       <div className="row g-4">
         <div className="col-12 col-md-6">
-          <label className="form-label d-flex justify-content-between">
+          <label
+            htmlFor="amount"
+            className="form-label d-flex justify-content-between"
+          >
             <span>
               Сумма займа: <strong>${amount}</strong>
             </span>
             <span className="text-muted small">$200 — $1000</span>
           </label>
           <input
+            id="amount"
             type="range"
             className="form-range"
             min={200}
@@ -72,13 +77,17 @@ export const LoanStep = (): JSX.Element => {
         </div>
 
         <div className="col-12 col-md-6">
-          <label className="form-label d-flex justify-content-between">
+          <label
+            htmlFor="termDays"
+            className="form-label d-flex justify-content-between"
+          >
             <span>
               Срок займа: <strong>{termDays}</strong> дней
             </span>
             <span className="text-muted small">10 — 30 дней</span>
           </label>
           <input
+            id="termDays"
             type="range"
             className="form-range"
             min={10}
